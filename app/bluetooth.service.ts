@@ -7,6 +7,9 @@ import { WorkerService } from './worker.service'
 export class BluetoothService {
   bluetoothAdapter: android.bluetooth.BluetoothAdapter
   socket: android.bluetooth.BluetoothSocket
+  balance: android.bluetooth.BluetoothDevice
+
+  outputStream: java.io.OutputStream
 
   constructor(private workerService: WorkerService) {
     this.bluetoothAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter()
@@ -32,29 +35,26 @@ export class BluetoothService {
   ): void {
     console.log('## From Notify', device)
     const worker: Worker = this.workerService.initBluetoothWorker()
-    worker.postMessage(JSON.stringify(device))
+    worker.postMessage('// Launch worker')
     worker.onmessage = m => {
       console.log(m)
     }
   }
 
-  write(value: string): void {
-    const device: android.bluetooth.BluetoothDevice = this.bluetoothAdapter.getRemoteDevice(
-      '00:04:3E:52:E5:78'
+  write(command: string): void {
+    this.balance = this.getBalance()
+    this.socket = this.balance.createInsecureRfcommSocketToServiceRecord(
+      java.util.UUID.fromString('00001101-0000-1000-8000-00805F9B34FB')
     )
 
+    this.socket.connect()
+    this.outputStream = this.socket.getOutputStream()
+
     try {
-      if (!this.socket) {
-        this.socket = device.createInsecureRfcommSocketToServiceRecord(
-          java.util.UUID.fromString('00001101-0000-1000-8000-00805F9B34FB')
-        )
-      }
+      const text = new java.lang.String(command)
+      const data = text.getBytes('UTF-8')
 
-      this.socket.connect()
-
-      const outputStream: java.io.OutputStream = this.socket.getOutputStream()
-
-      outputStream.write(1111)
+      this.outputStream.write(data)
       console.log('WRITING :::')
     } catch (e) {
       console.log('ERROR while writing stream', e)
@@ -65,7 +65,6 @@ export class BluetoothService {
     return this.bluetoothAdapter.getBondedDevices().toArray()
   }
 
-  // TODO: Change function name
   getBalance(): android.bluetooth.BluetoothDevice {
     const device: android.bluetooth.BluetoothDevice = this.bluetoothAdapter.getRemoteDevice(
       '00:04:3E:52:E5:78'

@@ -66,6 +66,7 @@ export class BluetoothService {
   }
 
   getBalance(): android.bluetooth.BluetoothDevice {
+    // Get device : replace string by your device ID.
     const device: android.bluetooth.BluetoothDevice = this.bluetoothAdapter.getRemoteDevice(
       '00:04:3E:52:E5:78'
     )

@@ -25,6 +25,8 @@ context.onmessage = (msg: MessageEvent) => {
           while (inputStream.available() > 0) {
             result.push(inputStream.read())
           }
+
+          // Format and push response to BluetoothService.
           const formattedResult = result
             .map<string>(value => {
               return String.fromCharCode(value)

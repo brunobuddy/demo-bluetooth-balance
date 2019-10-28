@@ -22,11 +22,10 @@ import { BluetoothService } from './bluetooth.service'
   `
 })
 export class AppComponent implements OnInit {
-  private bluetoothWorker: Worker
-
   constructor(private bluetoothService: BluetoothService) {}
 
   async ngOnInit() {
+    // Check if Bluetooth enabled.
     const isEnabled = await this.bluetoothService.isEnabled()
 
     if (!isEnabled) {

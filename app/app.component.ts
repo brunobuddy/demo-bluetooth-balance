@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
     setInterval(() => {
       // Write
       try {
-        const text = new java.lang.String("READ0D")
+        const text = new java.lang.String("TARE0D")
         const data = text.getBytes("UTF-8")
 
         data[4] = 13
@@ -78,8 +78,8 @@ export class AppComponent implements OnInit {
 
       setTimeout(() => {
         this.read(inputStream)
-      }, 200)
-    }, 1000)
+      }, 500)
+    }, 2000)
   }
 
   write(command: string): void {
@@ -88,20 +88,25 @@ export class AppComponent implements OnInit {
 
   read(inputStream) {
     console.log("## Reading ...")
+
+    const result = []
+
     if (inputStream.available() > 0) {
       console.log("@@@ READ SOMETHING")
-      const result = []
       while (inputStream.available() > 0) {
         result.push(inputStream.read())
       }
-
-      // Format and push response to BluetoothService.
-      const formattedResult = result
-        .map<string>(value => {
-          return String.fromCharCode(value)
-        })
-        .join("")
-      ;(<any>global).postMessage(formattedResult)
     }
+
+    console.log("@@ RESULT :", result)
+
+    // Format and push response to BluetoothService.
+    const formattedResult = result
+      .map<string>(value => {
+        return String.fromCharCode(value)
+      })
+      .join("")
+
+    console.log("@@@@@ FORMATTED RESULT", formattedResult)
   }
 }
